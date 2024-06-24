@@ -97,3 +97,6 @@ const artists = [
   "Yulia Niko",
   "Post Malone",
 ];
+
+export const outside_lands = "https://concertcrap.com/wp-content/uploads/2024/04/outside-lands-poster.png";
+export const portola = "https://media.web.aegpresents.com/content/img/xKebjkcVjWfwYN2GB5Vrm.jpg"

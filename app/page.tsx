@@ -1,6 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function TestPage() {
   const [artists, setArtists] = useState<string[]>([]);
@@ -9,20 +12,18 @@ export default function TestPage() {
   const handleTestAPI = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/chat', { method: 'POST' });
+      const res = await fetch("/api/ask_ai", { method: "POST" });
       const data = await res.json();
 
-      console.log(data, 'data');
-      
+      console.log(data, "data");
+
       // Parse the JSON string in the response
       const parsedData = JSON.parse(data.message.content);
 
-
-      
       // Set the artists array from the parsed data
       setArtists(parsedData.artists);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       setArtists([]);
     } finally {
       setIsLoading(false);
@@ -30,25 +31,36 @@ export default function TestPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Test OpenAI API</h1>
-      <button 
-        onClick={handleTestAPI}
-        disabled={isLoading}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        {isLoading ? 'Loading...' : 'Test API'}
-      </button>
-      {artists.length > 0 && (
-        <div className="mt-4">
-          <h2 className="text-xl font-semibold mb-2">Artists:</h2>
-          <ul className="list-disc pl-5">
-            {artists.map((artist, index) => (
-              <li key={index}>{artist}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+    <div className="p-4 max-w-2xl mx-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Test OpenAI API</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleTestAPI} disabled={isLoading}>
+            {isLoading ? "Loading..." : "Test API"}
+          </Button>
+
+          {artists.length > 0 && (
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Artists</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                  <ul className="space-y-2">
+                    {artists.map((artist, index) => (
+                      <li key={index} className="text-sm">
+                        {artist}
+                      </li>
+                    ))}
+                  </ul>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

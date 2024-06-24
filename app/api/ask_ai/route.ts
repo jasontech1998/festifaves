@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 
+import { outside_lands, portola } from "@/app/data";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest) {
             {
               type: "image_url",
               image_url: {
-                url: "https://preview.redd.it/fs6nvrn9f9wc1.jpeg?width=614&auto=webp&s=62551a33447a3a7ca523b8c4867e277a75ff90b7",
+                url: outside_lands,
               },
             },
           ],
