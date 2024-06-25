@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
             {
               type: "image_url",
               image_url: {
-                url: outside_lands,
+                url: portola,
               },
             },
           ],

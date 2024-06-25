@@ -15,10 +15,10 @@ export default function TestPage() {
       const res = await fetch("/api/ask_ai", { method: "POST" });
       const data = await res.json();
 
-      console.log(data, "data");
-
       // Parse the JSON string in the response
       const parsedData = JSON.parse(data.message.content);
+
+      console.log(parsedData);
 
       // Set the artists array from the parsed data
       setArtists(parsedData.artists);
