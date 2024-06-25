@@ -1,4 +1,4 @@
-const artists = [
+export const fakeArtists = [
   "Tyler The Creator",
   "The Killers",
   "Sturgill Simpson",
