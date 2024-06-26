@@ -29,7 +29,7 @@ export default function FestiFaves() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-blue-900 to-black text-white p-8">
+    <div className="p-8">
       <header className="mb-12">
         <h1 className="text-3xl font-bold">FestiFaves</h1>
       </header>
@@ -39,7 +39,7 @@ export default function FestiFaves() {
         <p className="text-xl mb-12">Generate your festival playlist now.</p>
 
         <div className="max-w-md mx-auto">
-          <Card className="bg-gradient-to-br from-purple-600 to-blue-700 shadow-lg border-0 overflow-hidden">
+          <Card className="shadow-lg border-0 overflow-hidden">
             <CardContent className="p-8">
               <h3 className="text-3xl font-semibold mb-6 text-center">Generate Playlist</h3>
               <div className="bg-white bg-opacity-20 p-6 rounded-lg backdrop-filter backdrop-blur-sm">
