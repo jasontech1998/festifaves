@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 import { SessionProvider } from "@/components/provider";
 import { cn } from "@/lib/utils";
 import "./globals.css";
+import Header from "@/components/Header";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -23,11 +24,14 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-[#22372B] text-white font-sans antialiased",
           fontSans.variable
         )}
       >
-        <SessionProvider>{children}</SessionProvider>
+        <Header />
+        <main className="flex-grow">
+          <SessionProvider>{children}</SessionProvider>
+        </main>
       </body>
     </html>
   );
