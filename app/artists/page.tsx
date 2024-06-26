@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { ArtistResult, GetArtists } from "@/lib/actions";
+import { ArtistResult, GetArtists, SavedTrack } from "@/lib/actions";
 import Image from "next/image";
+import GenerateSongsButton from "@/components/GenerateSongsButton";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<ArtistResult[]>([]);
@@ -42,11 +43,6 @@ export default function ArtistsPage() {
     fetchArtists();
   }, [fetchArtists]);
 
-  const handleCreatePlaylist = () => {
-    console.log(artists);
-    // Implement playlist creation logic here
-    console.log("Creating playlist...");
-  };
 
   return (
     <div className="flex flex-col lg:flex-row p-4 lg:p-8 gap-8">
@@ -93,14 +89,11 @@ export default function ArtistsPage() {
         <div className="bg-white p-6 rounded-lg shadow-md text-black">
           <h2 className="text-2xl font-bold mb-4">Generate Playlist</h2>
           <p className="mb-6">
-            Click the button below to create a playlist with your liked songs from these artists!
+            Click the button below to create a personalized playlist featuring your these artists!
           </p>
-          <button
-            onClick={handleCreatePlaylist}
-            className="w-full bg-purple-500 text-white font-bold py-2 px-4 rounded hover:bg-purple-600 transition duration-300"
-          >
-            Create Festival Playlist
-          </button>
+          <GenerateSongsButton 
+            artists={artists}
+          />
         </div>
       </div>
     </div>
