@@ -4,8 +4,9 @@ import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { Button } from "./ui/button";
 
-const UploadFestivalButton: React.FC = () => {
+const UploadImage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const { data: session } = useSession();
@@ -97,15 +98,9 @@ const UploadFestivalButton: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-      <h2 className="text-3xl font-semibold mb-4 text-center text-gray-800">
-        Hi, {session?.user?.name}
-      </h2>
-      <h3 className="text-2xl font-semibold mb-4 text-center text-gray-800">
-        Upload Festival Lineup
-      </h3>
-      <p className="mb-6 text-center text-gray-600">
-        Upload an image of your festival lineup to generate a list of artists!
+    <div className="">
+      <p className="leading-7 my-6">
+        Upload a png or jpeg of your festival lineup to generate a list of artists!
       </p>
       <input
         type="file"
@@ -114,13 +109,13 @@ const UploadFestivalButton: React.FC = () => {
         accept="image/png,image/jpeg"
         className="hidden"
       />
-      <button
+      <Button
         onClick={() => fileInputRef.current?.click()}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center mb-4"
+        className="w-full mb-4"
       >
         <Upload className="mr-2 h-5 w-5" />
         Select Image
-      </button>
+      </Button>
       {fileName && (
         <p className="text-center text-gray-600 mb-4">
           Selected file: {fileName}
@@ -138,4 +133,4 @@ const UploadFestivalButton: React.FC = () => {
   );
 };
 
-export default UploadFestivalButton;
+export default UploadImage;

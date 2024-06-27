@@ -1,16 +1,19 @@
-import React from 'react';
-import Link from 'next/link';
+"use client";
 
-const Header: React.FC = () => {
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { signOut, useSession } from "next-auth/react";
+
+export default function Header() {
+  const { data: session } = useSession();
   return (
-    <header className="p-8">
-      <nav>
-        <Link href="/" className="text-3xl font-bold text-white hover:text-gray-300 transition-colors">
+    <header className="py-4 px-6">
+      <div className="container max-w-3xl mx-auto flex justify-between items-center">
+        <Link href="/" className="text-3xl font-bold">
           FestiFaves
         </Link>
-      </nav>
+        {session && <Button  onClick={() => signOut({callbackUrl: '/'})}>Sign Out</Button>}
+      </div>
     </header>
   );
-};
-
-export default Header;
+}

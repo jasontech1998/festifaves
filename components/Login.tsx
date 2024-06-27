@@ -6,10 +6,10 @@ import { Music } from "lucide-react";
 
 export default function Login() {
   return (
-    <div className="m-4 flex flex-col">
+    <div className="m-4 flex flex-col items-center">
       <Button
-        className="w-full bg-[#1DB954] hover:bg-[#1ed760] text-white py-6 text-xl font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 rounded-full flex items-center justify-center"
-        onClick={() => signIn()}
+        className="w-48 flex items-center justify-center"
+        onClick={() => signIn("spotify", { callbackUrl: "/home" })}
       >
         <Music className="mr-2 h-6 w-6" />
         Sign in with Spotify
