@@ -9,6 +9,12 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    const { imageUrl } = await request.json();
+
+    if (!imageUrl) {
+      return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       response_format: { "type": "json_object" },
@@ -24,7 +30,7 @@ export async function POST(request: NextRequest) {
             {
               type: "image_url",
               image_url: {
-                url: portola,
+                url: imageUrl,
               },
             },
           ],

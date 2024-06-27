@@ -43,7 +43,7 @@ const UploadFestivalButton: React.FC = () => {
         throw new Error("Failed to get upload URL");
       }
 
-      const { url, fields } = await urlResponse.json();
+      const { url, fields, s3Url } = await urlResponse.json();
 
       // Upload directly to S3 using the signed URL
       const formData = new FormData();
@@ -62,7 +62,32 @@ const UploadFestivalButton: React.FC = () => {
       }
 
       console.log("File uploaded successfully");
-      // Handle successful upload (e.g., show success message, navigate to next page)
+
+      // Handle successful upload
+      console.log("image url:", s3Url);
+      // use that to call openai POST and insert as image_url
+
+      const openAiResponse = await fetch("/api/openai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl: s3Url }),
+      });
+
+      if (!openAiResponse.ok) {
+        throw new Error("Failed to process image with OpenAI");
+      }
+
+      const openAiData = await openAiResponse.json();
+
+      const parsedOpenAiData =  JSON.parse(openAiData.message.content);
+      console.log("OpenAI response:", parsedOpenAiData);
+
+        // Store the artists data in localStorage
+        localStorage.setItem('festifaves_artists', JSON.stringify(parsedOpenAiData.artists));
+      
+        // Navigate to the artists page
+        router.push('/artists');
+
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
