@@ -6,11 +6,7 @@ import Login from '@/components/Login';
 import UploadFestivalButton from '@/components/UploadFestivalButton';
 
 const AuthenticatedAction: React.FC = () => {
-  const { data: session, status } = useSession();
-
-  if (status === 'loading') {
-    return <div>Loading...</div>;
-  }
+  const { data: session } = useSession();
 
   if (!session) {
     return <Login />;
