@@ -24,43 +24,45 @@ const UploadFestivalButton: React.FC = () => {
       alert("Please select a file first.");
       return;
     }
-  
+
     const file = fileInputRef.current.files[0];
     setIsLoading(true);
-  
+
     try {
       // Get a pre-signed URL from your server
-      const urlResponse = await fetch('/api/get_upload_url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: file.name, fileType: file.type })
-      });
-  
+      const urlResponse = await fetch(
+        process.env.NEXT_PUBLIC_BASE_URL + "/api/upload",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileName: file.name, contentType: file.type }),
+        }
+      );
+
       if (!urlResponse.ok) {
-        throw new Error('Failed to get upload URL');
+        throw new Error("Failed to get upload URL");
       }
-  
+
       const { url, fields } = await urlResponse.json();
-  
+
       // Upload directly to S3 using the signed URL
       const formData = new FormData();
       Object.entries(fields).forEach(([key, value]) => {
         formData.append(key, value as string);
       });
-      formData.append('file', file);
-  
+      formData.append("file", file);
+
       const uploadResponse = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
-  
+
       if (!uploadResponse.ok) {
-        throw new Error('Failed to upload file to S3');
+        throw new Error("Failed to upload file to S3");
       }
-  
-      console.log('File uploaded successfully');
+
+      console.log("File uploaded successfully");
       // Handle successful upload (e.g., show success message, navigate to next page)
-  
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
@@ -71,7 +73,9 @@ const UploadFestivalButton: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-      <h2 className="text-3xl font-semibold mb-4 text-center text-gray-800">Hi, {session?.user?.name}</h2>
+      <h2 className="text-3xl font-semibold mb-4 text-center text-gray-800">
+        Hi, {session?.user?.name}
+      </h2>
       <h3 className="text-2xl font-semibold mb-4 text-center text-gray-800">
         Upload Festival Lineup
       </h3>
@@ -92,7 +96,11 @@ const UploadFestivalButton: React.FC = () => {
         <Upload className="mr-2 h-5 w-5" />
         Select Image
       </button>
-      {fileName && <p className="text-center text-gray-600 mb-4">Selected file: {fileName}</p>}
+      {fileName && (
+        <p className="text-center text-gray-600 mb-4">
+          Selected file: {fileName}
+        </p>
+      )}
       <button
         onClick={handleUpload}
         disabled={isLoading || !fileName}
