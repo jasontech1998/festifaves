@@ -4,6 +4,20 @@ import { unstable_noStore as noStore } from "next/cache";
 import { auth } from "@/auth";
 import { cache } from "react";
 
+interface SpotifyUserProfile {
+  display_name: string;
+  email: string;
+  images: { url: string }[];
+  id: string;
+}
+
+const profileInitialState = {
+  display_name: "",
+  email: "",
+  images: [{ url: "" }],
+  id: "",
+};
+
 export type ArtistResult = {
   name: string;
   id: string;
@@ -27,6 +41,85 @@ export interface SavedTrack {
   id: string;
   artistName: string;
   albumName: string;
+}
+
+export async function GetProfile(): Promise<SpotifyUserProfile> {
+  const session = await auth();
+  try {
+    const response = await fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: "Bearer " + session?.token,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch profile");
+    }
+
+    const data = await response.json();
+    return data as SpotifyUserProfile;
+  } catch (error) {
+    console.error("An error occurred while fetching profile:", error);
+    return profileInitialState;
+  }
+}
+
+export async function CreatePlaylistLink(
+  playlistName: string,
+  savedTracks: any,
+  userId: string
+) {
+  const session = await auth();
+  try {
+    const createPlaylistResponse = await fetch(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session?.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: playlistName,
+          description: "Created with FestiFaves",
+          public: false,
+        }),
+      }
+    );
+
+    if (!createPlaylistResponse.ok) {
+      throw new Error("Failed to create playlist");
+    }
+
+    const playlistData = await createPlaylistResponse.json();
+
+    const { id } = playlistData;
+    const newPlaylistUrl = playlistData.external_urls.spotify;
+
+    const playlistUrl = newPlaylistUrl;
+
+    const addTracksResponse = await fetch(
+      `https://api.spotify.com/v1/playlists/${id}/tracks`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session?.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uris: savedTracks,
+        }),
+      }
+    );
+
+    if (!addTracksResponse.ok) {
+      throw new Error("Failed to add tracks to the playlist");
+    }
+
+    return playlistUrl;
+  } catch (error) {
+    console.log("error");
+  }
 }
 
 export const CreatePlaylist = cache(
