@@ -34,7 +34,7 @@ const itemVariants = {
 const AnimatedFeatureList: React.FC = () => {
   return (
     <motion.ul 
-      className="text-left list-none space-y-4 mb-8"
+      className="text-left list-none space-y-4 mb-8 max-w-md mx-auto"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -42,10 +42,10 @@ const AnimatedFeatureList: React.FC = () => {
       {features.map((feature, index) => (
         <motion.li 
           key={index} 
-          className="flex items-center justify-center"
+          className="flex items-start"
           variants={itemVariants}
         >
-          <Check className="h-6 w-6 mr-2 text-[#1DB954]" />
+          <Check className="h-6 w-6 mr-3 mt-0.5 flex-shrink-0 text-[#1DB954]" />
           {feature}
         </motion.li>
       ))}

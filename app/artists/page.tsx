@@ -4,7 +4,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ArtistResult, GetArtists } from "@/lib/actions";
 import Image from "next/image";
 import GenerateSongsButton from "@/components/GenerateSongsButton";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<ArtistResult[]>([]);
@@ -52,11 +60,49 @@ export default function ArtistsPage() {
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <h1 className="text-2xl font-semibold tracking-tight mb-6">Artists Found</h1>
+      <h1 className="text-2xl font-semibold tracking-tight mb-6">
+        Artists Found
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
+          {!isLoading && !error && artists.length > 0 ? (
+            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+              <ul className="space-y-4">
+                {artists.map((artist, index) => (
+                  <li
+                    key={artist.id + index}
+                    className="flex items-center p-2 bg-accent rounded-lg"
+                  >
+                    <div className="w-12 h-12 relative mr-3 flex-shrink-0">
+                      <Image
+                        src={artist.imageUrl}
+                        alt={artist.name}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-full"
+                      />
+                    </div>
+                    <div>
+                      <h2 className="font-semibold">{artist.name}</h2>
+                      <p className="text-sm text-gray-600">
+                        {artist.genres && artist.genres.length > 0
+                          ? artist.genres[0]
+                          : "No genre"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          ) : (
+            <p className="text-gray-600">
+              No artists found. Please upload a festival lineup image.
+            </p>
+          )}
+        </div>
+        <div className="space-y-6">
           {imageUrl && (
-            <div className="mb-6 relative w-full h-64">
+            <div className="relative w-full h-64 md:h-80 lg:h-96">
               <Image
                 src={imageUrl}
                 alt="Festival lineup"
@@ -66,40 +112,18 @@ export default function ArtistsPage() {
               />
             </div>
           )}
-          {!isLoading && !error && artists.length > 0 ? (
-            <ul className="space-y-4">
-              {artists.map((artist, index) => (
-                <li key={artist.id + index} className="flex items-center p-2 bg-accent rounded-lg">
-                  <div className="w-12 h-12 relative mr-3 flex-shrink-0">
-                    <Image
-                      src={artist.imageUrl}
-                      alt={artist.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-full"
-                    />
-                  </div>
-                  <div>
-                    <h2 className="font-semibold">{artist.name}</h2>
-                    <p className="text-sm text-gray-600">
-                      {artist.genres && artist.genres.length > 0 ? artist.genres[0] : "No genre"}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-600">No artists found. Please upload a festival lineup image.</p>
-          )}
-        </div>
-        <div>
           <Card>
             <CardHeader>
               <CardTitle>Generate Festival Playlist</CardTitle>
-              <CardDescription>Create a playlist based on your favorite festival artists</CardDescription>
+              <CardDescription>
+                Create a playlist based on your favorite festival artists
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>Ready to bring your festival experience to life? Generate a playlist featuring tracks from these amazing artists!</p>
+              <p>
+                Ready to bring your festival experience to life? Generate a
+                playlist featuring tracks from these amazing artists!
+              </p>
             </CardContent>
             <CardFooter>
               <GenerateSongsButton artists={artists} />

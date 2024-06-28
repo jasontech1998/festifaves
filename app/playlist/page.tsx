@@ -12,6 +12,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PlaylistPage: React.FC = () => {
   const [playlist, setPlaylist] = useState<SavedTrack[]>([]);
@@ -77,20 +78,24 @@ const PlaylistPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           {playlist.length > 0 ? (
-            <ul className="space-y-4">
-              {playlist.map((track, index) => (
-                <li
-                  key={index}
-                  className="flex items-center p-2 bg-accent rounded-lg"
-                >
-                  <Music className="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" />
-                  <div>
-                    <h2 className="font-semibold">{track.name}</h2>
-                    <p className="text-sm text-gray-600">{track.artistName}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+              <ul className="space-y-4">
+                {playlist.map((track, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center p-2 bg-accent rounded-lg"
+                  >
+                    <Music className="w-5 h-5 mr-3 text-gray-500 flex-shrink-0" />
+                    <div>
+                      <h2 className="font-semibold">{track.name}</h2>
+                      <p className="text-sm text-gray-600">
+                        {track.artistName}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
           ) : (
             <p className="text-gray-600">
               No tracks found in your playlist. Try generating a new playlist!

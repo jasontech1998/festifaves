@@ -6,7 +6,7 @@ import { Music } from "lucide-react";
 
 export default function Login() {
   return (
-    <div className="m-4 flex flex-col items-center">
+    <div className="flex flex-col items-center">
       <Button
         className="w-48 flex items-center justify-center"
         onClick={() => signIn("spotify", { callbackUrl: "/home" })}
