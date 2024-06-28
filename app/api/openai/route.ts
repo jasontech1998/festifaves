@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         {
           role: "user",
           content: [
-            { type: "text", text: "Return an array of strings of all the artists in this music festival poster." },
+            { type: "text", text: "Return an array of strings of all the artists in this music festival poster and the name of the festival called festival name." },
             {
               type: "image_url",
               image_url: {

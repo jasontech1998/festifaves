@@ -12,7 +12,9 @@ const UploadImage: React.FC = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
@@ -55,7 +57,7 @@ const UploadImage: React.FC = () => {
 
       console.log("File uploaded successfully");
       setImageUrl(s3Url);
-      localStorage.setItem('festifaves_image_url', s3Url);
+      localStorage.setItem("festifaves_image_url", s3Url);
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
@@ -89,6 +91,12 @@ const UploadImage: React.FC = () => {
       localStorage.setItem(
         "festifaves_artists",
         JSON.stringify(parsedOpenAiData.artists)
+      );
+
+      // set the festival_name
+      localStorage.setItem(
+        "festifaves_festival_name",
+        parsedOpenAiData.festival_name
       );
 
       router.push("/artists");

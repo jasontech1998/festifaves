@@ -20,15 +20,21 @@ export default function ArtistsPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasFetched, setHasFetched] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [festivalName, setFestivalName] = useState<string | null>(null);
 
   const fetchArtists = useCallback(async () => {
     if (hasFetched) return; // Prevent multiple fetches
 
     const storedArtists = localStorage.getItem("festifaves_artists");
     const storedImageUrl = localStorage.getItem("festifaves_image_url");
+    const storedFestivalName = localStorage.getItem("festifaves_festival_name");
 
     if (storedImageUrl) {
       setImageUrl(storedImageUrl);
+    }
+
+    if (storedFestivalName) {
+      setFestivalName(storedFestivalName)
     }
 
     if (storedArtists) {
@@ -61,7 +67,7 @@ export default function ArtistsPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
-        Artists Found
+        Artists Found for {festivalName}
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -77,8 +83,8 @@ export default function ArtistsPage() {
                       <Image
                         src={artist.imageUrl}
                         alt={artist.name}
-                        layout="fill"
-                        objectFit="cover"
+                        fill
+                        sizes="(max-width: 600px) 100vw, 50vw"
                         className="rounded-full"
                       />
                     </div>
@@ -106,17 +112,19 @@ export default function ArtistsPage() {
               <Image
                 src={imageUrl}
                 alt="Festival lineup"
-                layout="fill"
-                objectFit="contain"
+                fill
+                sizes="(max-width: 600px) 100vw, 50vw"
                 className="rounded-lg"
+                priority
+                style={{ objectFit: "contain" }}
               />
             </div>
           )}
           <Card>
             <CardHeader>
-              <CardTitle>Generate Festival Playlist</CardTitle>
+              <CardTitle>Generate {festivalName} Playlist</CardTitle>
               <CardDescription>
-                Create a playlist based on your favorite festival artists
+                Create a customized playlist of all your favorite artists from {festivalName}
               </CardDescription>
             </CardHeader>
             <CardContent>
