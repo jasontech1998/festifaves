@@ -46,7 +46,9 @@ const AnimatedFeatureList: React.FC = () => {
           variants={itemVariants}
         >
           <Check className="h-6 w-6 mr-3 mt-0.5 flex-shrink-0 text-[#1DB954]" />
-          {feature}
+          <span className="mt-0.5">
+            {feature}
+          </span>
         </motion.li>
       ))}
     </motion.ul>
