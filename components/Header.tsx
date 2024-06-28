@@ -8,7 +8,7 @@ export default function Header() {
   const { data: session } = useSession();
   return (
     <header className="py-4 px-6">
-      <div className="container max-w-3xl mx-auto flex justify-between items-center">
+      <div className="mx-auto flex justify-between items-center">
         <Link href="/" className="text-3xl font-bold">
           FestiFaves
         </Link>

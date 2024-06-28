@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ArtistResult, CreatePlaylist, SavedTrack } from "@/lib/actions";
 import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
 
 interface GenerateSongsButtonProps {
   artists: ArtistResult[];
@@ -34,18 +35,13 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({ artists }) =>
   };
 
   return (
-    <div>
-      <button
+    <div className="flex">
+      <Button
         onClick={handleGeneratePlaylist}
         disabled={isGenerating}
-        className={`w-full font-bold py-2 px-4 rounded transition duration-300 ${
-          isGenerating 
-            ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-purple-500 text-white hover:bg-purple-600'
-        }`}
       >
         {isGenerating ? 'Generating Playlist...' : 'Generate Festival Playlist'}
-      </button>
+      </Button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );

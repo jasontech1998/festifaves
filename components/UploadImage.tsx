@@ -2,9 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { Button } from "./ui/button";
+import UploadButton from "./UploadButton";
 
 const UploadImage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -80,15 +79,17 @@ const UploadImage: React.FC = () => {
 
       const openAiData = await openAiResponse.json();
 
-      const parsedOpenAiData =  JSON.parse(openAiData.message.content);
+      const parsedOpenAiData = JSON.parse(openAiData.message.content);
       console.log("OpenAI response:", parsedOpenAiData);
 
-        // Store the artists data in localStorage
-        localStorage.setItem('festifaves_artists', JSON.stringify(parsedOpenAiData.artists));
-      
-        // Navigate to the artists page
-        router.push('/artists');
+      // Store the artists data in localStorage
+      localStorage.setItem(
+        "festifaves_artists",
+        JSON.stringify(parsedOpenAiData.artists)
+      );
 
+      // Navigate to the artists page
+      router.push("/artists");
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
@@ -97,39 +98,41 @@ const UploadImage: React.FC = () => {
     }
   };
 
+  const handleButtonClick = () => {
+    if (fileName) {
+      handleUpload();
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
   return (
-    <div className="">
+    <section>
       <p className="leading-7 my-6">
-        Upload a png or jpeg of your festival lineup to generate a list of artists!
+        Upload a png or jpeg of your festival lineup to generate a list of
+        artists!
       </p>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/png,image/jpeg"
-        className="hidden"
-      />
-      <Button
-        onClick={() => fileInputRef.current?.click()}
-        className="w-full mb-4"
-      >
-        <Upload className="mr-2 h-5 w-5" />
-        Select Image
-      </Button>
-      {fileName && (
-        <p className="text-center text-gray-600 mb-4">
-          Selected file: {fileName}
-        </p>
-      )}
-      <button
-        onClick={handleUpload}
-        disabled={isLoading || !fileName}
-        className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 px-4 rounded-full text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
-        <Upload className="mr-2 h-5 w-5" />
-        {isLoading ? "Uploading..." : "Upload and Process"}
-      </button>
-    </div>
+      <div className="flex flex-col justify-center items-center p-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/png,image/jpeg"
+          className="hidden"
+        />
+        <UploadButton
+          onClick={handleButtonClick}
+          isLoading={isLoading}
+          fileName={fileName}
+          isFileSelected={!!fileName}
+        />
+        {fileName && (
+          <p className="text-center text-gray-600 mb-4">
+            Selected file: {fileName}
+          </p>
+        )}
+      </div>
+    </section>
   );
 };
 

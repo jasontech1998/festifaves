@@ -43,59 +43,50 @@ export default function ArtistsPage() {
     fetchArtists();
   }, [fetchArtists]);
 
-
   return (
-    <div className="flex flex-col lg:flex-row p-4 lg:p-8 gap-8">
-      <div className="w-full order-2 lg:order-1 lg:w-2/3">
-        <h2 className="text-2xl font-bold mb-4 lg:mb-6">Artists Found</h2>
-        <p className="text-lg lg:text-xl mb-6 lg:mb-12">
-          Here are the artists we found in your festival lineup:
+    <section className="container mx-auto px-4 py-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="col-span-full flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Artists Found
+          </h1>
+          <GenerateSongsButton artists={artists} />
+        </div>
+
+        <p className="col-span-full text-sm text-gray-600 mb-4">
+          Click on an artist card to view their Spotify profile.
         </p>
 
-        {!isLoading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {artists.map((artist, index) => (
-              <a
-                key={artist.id + index}
-                href={artist.profileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center p-2 border rounded-lg hover:bg-gray-100 hover:text-gray-600 transition duration-300 ease-in-out"
-              >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mb-2">
-                  <Image
-                    src={artist.imageUrl}
-                    alt={artist.name}
-                    fill
-                    sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 128px, 160px"
-                    className="rounded-full"
-                  />
-                </div>
-                <h2 className="text-sm sm:text-base font-semibold text-center truncate w-full">
-                  {artist.name}
-                </h2>
-                <p className="text-xs text-gray-600 text-center truncate w-full">
-                  {artist.genres && artist.genres.length > 0
-                    ? artist.genres[0]
-                    : "No genre"}
-                </p>
-              </a>
-            ))}
-          </div>
-        )}
+        {!isLoading &&
+          !error &&
+          artists.map((artist, index) => (
+            <a
+              key={artist.id + index}
+              href={artist.profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center p-2 border rounded-lg hover:bg-gray-100 hover:text-gray-600 transition duration-300 ease-in-out"
+            >
+              <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mb-2">
+                <Image
+                  src={artist.imageUrl}
+                  alt={artist.name}
+                  fill
+                  sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, (max-width: 1024px) 128px, 160px"
+                  className="rounded-full"
+                />
+              </div>
+              <h2 className="text-sm sm:text-base font-semibold text-center truncate w-full">
+                {artist.name}
+              </h2>
+              <p className="text-xs text-gray-600 text-center truncate w-full">
+                {artist.genres && artist.genres.length > 0
+                  ? artist.genres[0]
+                  : "No genre"}
+              </p>
+            </a>
+          ))}
       </div>
-
-      <div className="w-full order-1 lg:order-2 lg:w-1/3">
-        <div className="bg-white p-6 rounded-lg shadow-md text-black">
-          <h2 className="text-2xl font-bold mb-4">Generate Playlist</h2>
-          <p className="mb-6">
-            Click the button below to create a personalized playlist featuring your these artists!
-          </p>
-          <GenerateSongsButton 
-            artists={artists}
-          />
-        </div>
-      </div>
-    </div>
+    </section>
   );
 }
