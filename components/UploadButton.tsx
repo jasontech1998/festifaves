@@ -7,6 +7,7 @@ interface UploadButtonProps {
   isLoading: boolean;
   fileName: string | null;
   isFileSelected: boolean;
+  text: string;
 }
 
 const UploadButton: React.FC<UploadButtonProps> = ({

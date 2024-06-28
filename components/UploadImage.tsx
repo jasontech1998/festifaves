@@ -2,34 +2,27 @@
 
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import UploadButton from "./UploadButton";
+import Image from "next/image";
 
 const UploadImage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
-  const { data: session } = useSession();
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
+      await uploadFile(file);
     }
   };
 
-  const handleUpload = async () => {
-    if (!fileInputRef.current?.files?.[0]) {
-      alert("Please select a file first.");
-      return;
-    }
-
-    const file = fileInputRef.current.files[0];
+  const uploadFile = async (file: File) => {
     setIsLoading(true);
-
     try {
-      // Get a pre-signed URL from your server
       const urlResponse = await fetch(
         process.env.NEXT_PUBLIC_BASE_URL + "/api/upload",
         {
@@ -45,7 +38,6 @@ const UploadImage: React.FC = () => {
 
       const { url, fields, s3Url } = await urlResponse.json();
 
-      // Upload directly to S3 using the signed URL
       const formData = new FormData();
       Object.entries(fields).forEach(([key, value]) => {
         formData.append(key, value as string);
@@ -62,34 +54,8 @@ const UploadImage: React.FC = () => {
       }
 
       console.log("File uploaded successfully");
-
-      // Handle successful upload
-      console.log("image url:", s3Url);
-      // use that to call openai POST and insert as image_url
-
-      const openAiResponse = await fetch("/api/openai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: s3Url }),
-      });
-
-      if (!openAiResponse.ok) {
-        throw new Error("Failed to process image with OpenAI");
-      }
-
-      const openAiData = await openAiResponse.json();
-
-      const parsedOpenAiData = JSON.parse(openAiData.message.content);
-      console.log("OpenAI response:", parsedOpenAiData);
-
-      // Store the artists data in localStorage
-      localStorage.setItem(
-        "festifaves_artists",
-        JSON.stringify(parsedOpenAiData.artists)
-      );
-
-      // Navigate to the artists page
-      router.push("/artists");
+      setImageUrl(s3Url);
+      localStorage.setItem('festifaves_image_url', s3Url);
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while uploading the file.");
@@ -98,40 +64,85 @@ const UploadImage: React.FC = () => {
     }
   };
 
+  const handleProcessImage = async () => {
+    if (!imageUrl) {
+      alert("Please upload an image first.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const openAiResponse = await fetch("/api/openai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imageUrl }),
+      });
+
+      if (!openAiResponse.ok) {
+        throw new Error("Failed to process image with OpenAI");
+      }
+
+      const openAiData = await openAiResponse.json();
+      const parsedOpenAiData = JSON.parse(openAiData.message.content);
+      console.log("OpenAI response:", parsedOpenAiData);
+
+      localStorage.setItem(
+        "festifaves_artists",
+        JSON.stringify(parsedOpenAiData.artists)
+      );
+
+      router.push("/artists");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while processing the image.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleButtonClick = () => {
-    if (fileName) {
-      handleUpload();
+    if (imageUrl) {
+      handleProcessImage();
     } else {
       fileInputRef.current?.click();
     }
   };
 
   return (
-    <section>
-      <p className="leading-7 my-6">
+    <section className="flex flex-col items-center justify-center p-4">
+      <p className="leading-7 my-6 text-center">
         Upload a png or jpeg of your festival lineup to generate a list of
         artists!
       </p>
-      <div className="flex flex-col justify-center items-center p-4">
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept="image/png,image/jpeg"
-          className="hidden"
-        />
-        <UploadButton
-          onClick={handleButtonClick}
-          isLoading={isLoading}
-          fileName={fileName}
-          isFileSelected={!!fileName}
-        />
-        {fileName && (
-          <p className="text-center text-gray-600 mb-4">
-            Selected file: {fileName}
-          </p>
-        )}
-      </div>
+      {imageUrl && (
+        <div className="mb-4 relative w-full max-w-md h-64">
+          <Image
+            src={imageUrl}
+            alt="Uploaded festival lineup"
+            fill
+            objectFit="contain"
+          />
+        </div>
+      )}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/png,image/jpeg"
+        className="hidden"
+      />
+      <UploadButton
+        onClick={handleButtonClick}
+        isLoading={isLoading}
+        fileName={fileName}
+        isFileSelected={!!imageUrl}
+        text={imageUrl ? "Process Image" : "Select Image"}
+      />
+      {fileName && (
+        <p className="text-center text-gray-600 mt-4">
+          Selected file: {fileName}
+        </p>
+      )}
     </section>
   );
 };
