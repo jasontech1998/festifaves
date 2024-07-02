@@ -186,7 +186,6 @@ export const CreatePlaylist = cache(
         );
 
         // If we haven't found any saved tracks in the top tracks, check the latest album
-       
         if (!savedTracks.some((track) => track.artistName === artist.name)) {
           const albumsResponse = await fetch(
             `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album&limit=1`,
@@ -239,7 +238,26 @@ export const CreatePlaylist = cache(
             }
           }
         }
-         // if both of these didn't work, then just add the top 2 songs from the artist
+
+        // If both of these didn't work, then just add the top 2 songs from the artist
+        if (!savedTracks.some((track) => track.artistName === artist.name)) {
+          topTracksData.tracks
+            .slice(0, 2)
+            .forEach(
+              (track: {
+                id: string;
+                name: string;
+                album: { name: string };
+              }) => {
+                savedTracks.push({
+                  name: track.name,
+                  id: track.id,
+                  artistName: artist.name,
+                  albumName: track.album.name,
+                });
+              }
+            );
+        }
       } catch (error) {
         console.error(`Error processing artist ${artist.name}:`, error);
       }
