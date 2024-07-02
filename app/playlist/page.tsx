@@ -78,8 +78,8 @@ const PlaylistPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
-        Your&nbsp;
-        <span>{festivalName}</span> Playlist
+        Your Customized&nbsp; 
+        <span className="underline">{festivalName}</span> Playlist
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -111,7 +111,7 @@ const PlaylistPage: React.FC = () => {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Create Playlist</CardTitle>
+              <CardTitle>Create {festivalName} Playlist</CardTitle>
               <CardDescription>
                 Turn your festival favorites into a Spotify playlist
               </CardDescription>
