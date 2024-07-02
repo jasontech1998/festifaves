@@ -1,7 +1,6 @@
-import AnimatedFeatureList from "@/components/AnimatedFeatureList";
-import HeroSection from "@/components/HeroSection";
-import Login from "@/components/Login";
+
 import React from "react";
+import HeroSection from "@/components/HeroSection";
 
 export default function FestiFaves() {
   return (
