@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { ArtistResult, GetArtists } from "@/lib/actions";
 import Image from "next/image";
 import GenerateSongsButton from "@/components/GenerateSongsButton";
@@ -16,62 +16,75 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<ArtistResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [festivalName, setFestivalName] = useState<string | null>(null);
 
-  const fetchArtists = useCallback(async () => {
-    if (hasFetched) return; // Prevent multiple fetches
-
-    const storedArtists = localStorage.getItem("festifaves_artists");
-    const storedImageUrl = localStorage.getItem("festifaves_image_url");
-    const storedFestivalName = localStorage.getItem("festifaves_festival_name");
-
-    if (storedImageUrl) {
-      setImageUrl(storedImageUrl);
-    }
-
-    if (storedFestivalName) {
-      setFestivalName(storedFestivalName)
-    }
-
-    if (storedArtists) {
-      setIsLoading(true);
-      try {
-        const parsedArtists = JSON.parse(storedArtists) as string[];
-        console.log("Parsed Artists: ", parsedArtists);
-
-        if (parsedArtists.length > 0) {
-          const allArtists = await GetArtists(parsedArtists);
-          console.log("All Artists: ", allArtists);
-          setArtists(allArtists);
-          setHasFetched(true);
-        } else {
-          setError("No artists found in storage");
-        }
-      } catch (error) {
-        console.error("Error fetching artists:", error);
-        setError("Failed to fetch artists. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  }, [hasFetched]);
-
   useEffect(() => {
-    fetchArtists();
-  }, [fetchArtists]);
+    async function loadArtists() {
+      const storedArtists = localStorage.getItem("festifaves_artists");
+      const storedImageUrl = localStorage.getItem("festifaves_image_url");
+      const storedFestivalName = localStorage.getItem(
+        "festifaves_festival_name"
+      );
+
+      console.log(storedFestivalName);
+
+      if (storedImageUrl) {
+        setImageUrl(storedImageUrl);
+      }
+
+      if (storedFestivalName) {
+        setFestivalName(storedFestivalName);
+      }
+
+      if (storedArtists) {
+        try {
+          const parsedArtists = JSON.parse(storedArtists) as string[];
+          const fetchedArtists = await GetArtists(parsedArtists);
+          console.log("Fetched Artists: ", fetchedArtists);
+          setArtists(fetchedArtists);
+
+          // Check if any artists weren't found
+          const notFoundArtists = parsedArtists.filter(
+            (artist) =>
+              !fetchedArtists.some(
+                (fetchedArtist) =>
+                  fetchedArtist.name.toLowerCase() === artist.toLowerCase()
+              )
+          );
+          if (notFoundArtists.length > 0) {
+            console.warn("Some artists were not found:", notFoundArtists);
+            // You could set these in state and display them to the user if you want
+          }
+        } catch (error) {
+          console.error("Error fetching artists:", error);
+          setError("Failed to fetch artists. Please try again.");
+        }
+      } else {
+        setError(
+          "No artist data found. Please upload a festival lineup image."
+        );
+      }
+      setIsLoading(false);
+    }
+
+    loadArtists();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
-        Artists Found for {festivalName}
+        Artists Found for {festivalName || "Your Festival"}
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          {!isLoading && !error && artists.length > 0 ? (
+          {isLoading ? (
+            <p>Loading artists...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : artists.length > 0 ? (
             <ScrollArea className="h-dvh w-full rounded-md border p-4">
               <ul className="space-y-4">
                 {artists.map((artist, index) => (
@@ -122,9 +135,12 @@ export default function ArtistsPage() {
           )}
           <Card>
             <CardHeader>
-              <CardTitle>Generate {festivalName} Playlist</CardTitle>
+              <CardTitle>
+                Generate {festivalName || "Festival"} Playlist
+              </CardTitle>
               <CardDescription>
-                Create a customized playlist of all your favorite artists from {festivalName}
+                Create a customized playlist of all your favorite artists from{" "}
+                {festivalName || "the festival"}
               </CardDescription>
             </CardHeader>
             <CardContent>

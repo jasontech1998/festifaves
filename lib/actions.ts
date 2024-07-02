@@ -66,17 +66,22 @@ export async function GetProfile(): Promise<SpotifyUserProfile> {
 
 export async function CreatePlaylistLink(
   playlistName: string,
-  savedTracks: any,
+  savedTracks: string[],
   userId: string
 ) {
   const session = await auth();
+  if (!session?.token) {
+    throw new Error("No valid session token found");
+  }
+
   try {
+    // Create the playlist
     const createPlaylistResponse = await fetch(
       `https://api.spotify.com/v1/users/${userId}/playlists`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session?.token}`,
+          Authorization: `Bearer ${session.token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -88,37 +93,44 @@ export async function CreatePlaylistLink(
     );
 
     if (!createPlaylistResponse.ok) {
-      throw new Error("Failed to create playlist");
+      const errorData = await createPlaylistResponse.json();
+      console.error("Playlist creation error:", errorData);
+      throw new Error(`Failed to create playlist: ${createPlaylistResponse.status} ${createPlaylistResponse.statusText}`);
     }
 
     const playlistData = await createPlaylistResponse.json();
+    const { id: playlistId } = playlistData;
+    const playlistUrl = playlistData.external_urls.spotify;
 
-    const { id } = playlistData;
-    const newPlaylistUrl = playlistData.external_urls.spotify;
+    // Add tracks in batches
+    const batchSize = 100; // Spotify allows up to 100 tracks per request
+    for (let i = 0; i < savedTracks.length; i += batchSize) {
+      const batch = savedTracks.slice(i, i + batchSize);
+      const addTracksResponse = await fetch(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            uris: batch,
+          }),
+        }
+      );
 
-    const playlistUrl = newPlaylistUrl;
-
-    const addTracksResponse = await fetch(
-      `https://api.spotify.com/v1/playlists/${id}/tracks`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${session?.token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uris: savedTracks,
-        }),
+      if (!addTracksResponse.ok) {
+        const errorData = await addTracksResponse.json();
+        console.error("Add tracks error:", errorData);
+        throw new Error(`Failed to add tracks to the playlist: ${addTracksResponse.status} ${addTracksResponse.statusText}`);
       }
-    );
-
-    if (!addTracksResponse.ok) {
-      throw new Error("Failed to add tracks to the playlist");
     }
 
     return playlistUrl;
   } catch (error) {
-    console.log("error");
+    console.error("Error in CreatePlaylistLink:", error);
+    throw error; // Re-throw the error so it can be handled by the caller
   }
 }
 
@@ -306,48 +318,69 @@ function transformArtist(artist: SpotifyArtist): ArtistResult {
   };
 }
 
-export const GetArtists = cache(
-  async (artists: string[]): Promise<ArtistResult[]> => {
-    noStore();
-    const session = await auth();
-
-    if (!session?.token) {
-      throw new Error("No valid Spotify session found");
-    }
-
-    const results = await Promise.all(
-      artists.map(async (artistName) => {
-        try {
-          const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-              artistName
-            )}&type=artist&limit=3`,
-            {
-              headers: {
-                Authorization: `Bearer ${session.token}`,
-              },
-            }
-          );
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-
-          if (data.artists.items.length > 0) {
-            return findBestMatch(artistName, data.artists.items);
-          } else {
-            console.warn(`No Spotify artist found for: ${artistName}`);
-            return null;
-          }
-        } catch (error) {
-          console.error(`Error searching for artist ${artistName}:`, error);
-          return null;
-        }
-      })
+async function searchArtist(artistName: string, token: string): Promise<ArtistResult | null> {
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist&limit=5`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
 
-    return results.filter((result): result is ArtistResult => result !== null);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.artists.items.length > 0) {
+      return findBestMatch(artistName, data.artists.items);
+    }
+
+    console.warn(`No Spotify artist found for: ${artistName}`);
+    return null;
+  } catch (error) {
+    console.error(`Error searching for artist ${artistName}:`, error);
+    return null;
   }
-);
+}
+
+export async function GetArtists(artists: string[]): Promise<ArtistResult[]> {
+  noStore();
+  const session = await auth();
+
+  if (!session?.token) {
+    throw new Error("No valid Spotify session found");
+  }
+
+  const batchSize = 10;
+  const results: ArtistResult[] = [];
+
+  for (let i = 0; i < artists.length; i += batchSize) {
+    const batch = artists.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map(async (artistName) => {
+        let result = await searchArtist(artistName, session.token as string);
+        if (!result) {
+          // Retry once after a short delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          result = await searchArtist(artistName, session.token as string);
+        }
+        return result;
+      })
+    );
+    results.push(...batchResults.filter((result): result is ArtistResult => result !== null));
+  }
+
+  const notFoundArtists = artists.filter(artist => 
+    !results.some(result => result.name.toLowerCase() === artist.toLowerCase())
+  );
+
+  if (notFoundArtists.length > 0) {
+    console.warn("Artists not found:", notFoundArtists);
+  }
+
+  return results;
+}

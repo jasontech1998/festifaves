@@ -12,11 +12,20 @@ const UploadImage: React.FC = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const clearLocalStorageExceptImage = () => {
+    const imageUrl = localStorage.getItem("festifaves_image_url");
+    localStorage.clear();
+    if (imageUrl) {
+      localStorage.setItem("festifaves_image_url", imageUrl);
+    }
+  };
+
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (file) {
+      clearLocalStorageExceptImage();
       setFileName(file.name);
       await uploadFile(file);
     }
@@ -74,6 +83,7 @@ const UploadImage: React.FC = () => {
 
     setIsLoading(true);
     try {
+      clearLocalStorageExceptImage();
       const openAiResponse = await fetch("/api/openai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,7 +103,6 @@ const UploadImage: React.FC = () => {
         JSON.stringify(parsedOpenAiData.artists)
       );
 
-      // set the festival_name
       localStorage.setItem(
         "festifaves_festival_name",
         parsedOpenAiData.festival_name

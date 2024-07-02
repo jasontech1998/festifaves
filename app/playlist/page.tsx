@@ -16,14 +16,19 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const PlaylistPage: React.FC = () => {
   const [playlist, setPlaylist] = useState<SavedTrack[]>([]);
+  const [festivalName, setFestivalName] = useState<string | null>(null);
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const storedPlaylist = localStorage.getItem("festifaves_playlist");
+    const storedFestivalName = localStorage.getItem("festifaves_festival_name");
     if (storedPlaylist) {
       setPlaylist(JSON.parse(storedPlaylist));
+    }
+    if (storedFestivalName) {
+      setFestivalName(storedFestivalName);
     }
   }, []);
 
@@ -46,7 +51,7 @@ const PlaylistPage: React.FC = () => {
       console.log("Track URIs:", trackUris);
 
       // Call CreatePlaylistLink with the proper params
-      const playlistName = "My Festival Playlist"; // You can make this dynamic if needed
+      const playlistName = `My ${festivalName} Playlist`; // You can make this dynamic if needed
       const newPlaylistUrl = await CreatePlaylistLink(
         playlistName,
         trackUris,
@@ -73,7 +78,8 @@ const PlaylistPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
-        Your Festival Playlist
+        Your
+        <span> {festivalName}</span> Playlist
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
@@ -105,7 +111,7 @@ const PlaylistPage: React.FC = () => {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Create Spotify Playlist</CardTitle>
+              <CardTitle>Create Playlist</CardTitle>
               <CardDescription>
                 Turn your festival favorites into a Spotify playlist
               </CardDescription>

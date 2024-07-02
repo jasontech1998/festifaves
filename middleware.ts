@@ -1,18 +1,24 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
-  if (!token) {
-    // Redirect to the homepage if the user is not authenticated
-    if (request.nextUrl.pathname !== '/') {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+  // If the user is authenticated and trying to access the root path, redirect to /home
+  if (token && request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/home", request.url));
   }
 
-  return NextResponse.next()
+  // If the user is not authenticated and trying to access a protected route, redirect to the root
+  if (!token && request.nextUrl.pathname !== "/") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
@@ -24,6 +30,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
-}
+};
