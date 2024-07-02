@@ -13,6 +13,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArtistSkeleton } from "@/components/ArtistSkeleton";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<ArtistResult[]>([]);
@@ -28,8 +29,6 @@ export default function ArtistsPage() {
       const storedFestivalName = localStorage.getItem(
         "festifaves_festival_name"
       );
-
-      console.log(storedFestivalName);
 
       if (storedImageUrl) {
         setImageUrl(storedImageUrl);
@@ -81,7 +80,15 @@ export default function ArtistsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           {isLoading ? (
-            <p>Loading artists...</p>
+            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+              <ul className="space-y-4">
+                {[...Array(10)].map((_, index) => (
+                  <li key={index}>
+                    <ArtistSkeleton />
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : artists.length > 0 ? (
