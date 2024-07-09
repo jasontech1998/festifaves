@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArtistSkeleton } from "@/components/ArtistSkeleton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<ArtistResult[]>([]);
@@ -60,9 +62,7 @@ export default function ArtistsPage() {
           setError("Failed to fetch artists. Please try again.");
         }
       } else {
-        setError(
-          "No artist data found. Please upload a festival lineup image."
-        );
+        setError("No artist data found. Please go back and try again.");
       }
       setIsLoading(false);
     }
@@ -76,10 +76,10 @@ export default function ArtistsPage() {
         Artists Found for{" "}
         <span className="underline">{festivalName || "Your Festival"}</span>
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[650px]">
         <div>
           {isLoading ? (
-            <ScrollArea className="h-[700px] w-full rounded-md border p-4">
+            <ScrollArea className="h-[650px] w-full rounded-md border p-4">
               <ul className="space-y-4">
                 {[...Array(10)].map((_, index) => (
                   <li key={index}>
@@ -120,12 +120,15 @@ export default function ArtistsPage() {
               </ul>
             </ScrollArea>
           ) : (
-            <p className="text-gray-600">
-              No artists found. Please upload a festival lineup image.
-            </p>
+            <>
+              <p className="text-gray-600 mb-4">No artists found.</p>
+              <Button asChild>
+                <Link href="/home">Go back to home</Link>
+              </Button>
+            </>
           )}
         </div>
-        <div className="space-y-6">
+        <div className="space-y-6 flex flex-col h-full">
           {imageUrl && (
             <div className="relative w-full h-64 md:h-80 lg:h-96">
               <Image
@@ -139,7 +142,7 @@ export default function ArtistsPage() {
               />
             </div>
           )}
-          <Card>
+          <Card className="flex-grow flex flex-col">
             <CardHeader>
               <CardTitle>
                 Generate {festivalName || "Festival"} Playlist
@@ -149,7 +152,7 @@ export default function ArtistsPage() {
                 {festivalName || "the festival"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
               <p>
                 Ready to bring your festival experience to life? Generate a
                 playlist featuring tracks from these amazing artists!

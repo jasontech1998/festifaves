@@ -49,12 +49,10 @@ const PlaylistPage: React.FC = () => {
   const handleCreatePlaylist = async () => {
     setIsCreating(true);
     setError(null);
-    console.log("Creating playlist...");
 
     try {
       // Get user's Spotify user ID from GetProfile function
       const userProfile = await GetProfile();
-      console.log("User profile:", userProfile);
 
       if (!userProfile.id) {
         throw new Error("Failed to get user ID");
@@ -62,7 +60,6 @@ const PlaylistPage: React.FC = () => {
 
       // Extract all the IDs from the playlist and store in an array
       const trackUris = playlist.map((track) => `spotify:track:${track.id}`);
-      console.log("Track URIs:", trackUris);
 
       const playlistName = `My ${festivalName} Playlist`;
       const newPlaylistUrl = await CreatePlaylistLink(
@@ -87,14 +84,13 @@ const PlaylistPage: React.FC = () => {
     }
   };
 
-  console.log(artistsImage);
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
         Your Customized&nbsp;
         <span className="underline">{festivalName}</span> Playlist
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[650px]">
         <div>
           {playlist.length > 0 ? (
             <ScrollArea className="h-[650px] w-full rounded-md border p-4">
@@ -121,33 +117,31 @@ const PlaylistPage: React.FC = () => {
             </p>
           )}
         </div>
-        <div>
+        <div className="flex flex-col h-full">
           <div className="grid grid-cols-4 gap-2 mb-4">
-            {artistsImage.map((artist) => {
-              return (
-                <div
-                  className="w-[150px] h-[150px] flex items-center justify-center bg-gray-100"
-                  key={artist.id}
-                >
-                  <Image
-                    src={artist.imageUrl}
-                    alt="Artist Image"
-                    width={150}
-                    height={150}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-              );
-            })}
+            {artistsImage.map((artist) => (
+              <div
+                className="w-[150px] h-[150px] flex items-center justify-center bg-gray-100"
+                key={artist.id}
+              >
+                <Image
+                  src={artist.imageUrl}
+                  alt="Artist Image"
+                  width={150}
+                  height={150}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            ))}
           </div>
-          <Card>
+          <Card className="flex-grow flex flex-col">
             <CardHeader>
               <CardTitle>Create {festivalName} Playlist</CardTitle>
               <CardDescription>
                 Turn your festival favorites into a Spotify playlist
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-grow">
               <p>
                 Ready to take your festival vibes with you? Create a Spotify
                 playlist with all these amazing tracks!

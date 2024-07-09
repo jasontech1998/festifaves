@@ -36,13 +36,11 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
     try {
       const savedTracks = await CreatePlaylist(artists);
 
-      // Store the savedTracks in local storage
       localStorage.setItem("festifaves_playlist", JSON.stringify(savedTracks));
       localStorage.setItem("festifaves_artists", JSON.stringify(artists))
 
       setButtonState("submitted");
 
-      // Navigate to the playlist page after a short delay
       setTimeout(() => {
         router.push("/playlist");
       }, 1000);

@@ -6,7 +6,7 @@ import {
 import { NextAuthOptions, getServerSession } from "next-auth";
 
 const SpotifyScope =
-  "user-read-recently-played user-read-playback-state user-top-read user-modify-playback-state user-read-currently-playing user-follow-read playlist-read-private user-read-email user-read-private user-library-read playlist-read-collaborative playlist-modify-private";
+  "user-top-read user-follow-read playlist-read-private user-read-email user-read-private user-library-read playlist-read-collaborative playlist-modify-private";
 
 import SpotifyProvider from 'next-auth/providers/spotify';
 
