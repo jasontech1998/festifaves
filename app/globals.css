@@ -50,21 +50,17 @@
 }
 
 .gradient-background {
-  background: 
-    /* Top left spotlight */ radial-gradient(
+  background: radial-gradient(
       circle at top left,
       rgba(30, 108, 233, 0.2) 38%,
       transparent 30%
     ),
-    /* Bottom right spotlight */
-      radial-gradient(
-        circle at top right,
-        rgba(6, 224, 151, 0.35) 40%,
+    radial-gradient(
+      circle at top right,
+      rgba(6, 224, 151, 0.35) 40%,
 
-        transparent 20%
-      );
-  /* Main gradient from top to bottom */
-
+      transparent 20%
+    );
   background-size: 110% 100%;
   animation: gradientShift 20s linear infinite;
   position: fixed;
