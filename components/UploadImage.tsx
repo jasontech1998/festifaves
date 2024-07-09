@@ -96,7 +96,6 @@ const UploadImage: React.FC = () => {
 
       const openAiData = await openAiResponse.json();
       const parsedOpenAiData = JSON.parse(openAiData.message.content);
-      console.log("OpenAI response:", parsedOpenAiData);
 
       localStorage.setItem(
         "festifaves_artists",
@@ -105,7 +104,10 @@ const UploadImage: React.FC = () => {
 
       localStorage.setItem(
         "festifaves_festival_name",
-        parsedOpenAiData.festival_name
+        parsedOpenAiData.festival_name &&
+          parsedOpenAiData.festival_name !== "Undefined"
+          ? parsedOpenAiData.festival_name
+          : "Festival"
       );
 
       router.push("/artists");
@@ -132,11 +134,12 @@ const UploadImage: React.FC = () => {
         artists!
       </p>
       {imageUrl && (
-        <div className="mb-4 relative w-full max-w-md h-64">
+        <div className="mb-4 flex justify-center relative w-full max-w-md">
           <Image
             src={imageUrl}
             alt="Uploaded festival lineup"
-            fill
+            width={256}
+            height={256}
             objectFit="contain"
           />
         </div>

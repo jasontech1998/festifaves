@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { SavedTrack, GetProfile, CreatePlaylistLink } from "@/lib/actions";
+import {
+  SavedTrack,
+  GetProfile,
+  CreatePlaylistLink,
+  ArtistResult,
+} from "@/lib/actions";
 import { ExternalLink, Music } from "lucide-react";
 import {
   Card,
@@ -13,17 +18,26 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Image from "next/image";
 
 const PlaylistPage: React.FC = () => {
   const [playlist, setPlaylist] = useState<SavedTrack[]>([]);
   const [festivalName, setFestivalName] = useState<string | null>(null);
+  const [artistsImage, setArtistsImage] = useState<ArtistResult[]>([]);
   const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const storedArtists = localStorage.getItem("festifaves_artists");
     const storedPlaylist = localStorage.getItem("festifaves_playlist");
     const storedFestivalName = localStorage.getItem("festifaves_festival_name");
+
+    if (storedArtists) {
+      const artists = JSON.parse(storedArtists);
+      setArtistsImage(artists.slice(0, 8));
+    }
+
     if (storedPlaylist) {
       setPlaylist(JSON.parse(storedPlaylist));
     }
@@ -50,8 +64,7 @@ const PlaylistPage: React.FC = () => {
       const trackUris = playlist.map((track) => `spotify:track:${track.id}`);
       console.log("Track URIs:", trackUris);
 
-      // Call CreatePlaylistLink with the proper params
-      const playlistName = `My ${festivalName} Playlist`; // You can make this dynamic if needed
+      const playlistName = `My ${festivalName} Playlist`;
       const newPlaylistUrl = await CreatePlaylistLink(
         playlistName,
         trackUris,
@@ -64,7 +77,6 @@ const PlaylistPage: React.FC = () => {
 
       // Show the link of playlist that it returns
       setPlaylistUrl(newPlaylistUrl);
-      console.log("Playlist created:", newPlaylistUrl);
     } catch (err) {
       console.error("Error creating playlist:", err);
       setError(
@@ -75,16 +87,17 @@ const PlaylistPage: React.FC = () => {
     }
   };
 
+  console.log(artistsImage);
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-2xl font-semibold tracking-tight mb-6">
-        Your Customized&nbsp; 
+        Your Customized&nbsp;
         <span className="underline">{festivalName}</span> Playlist
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           {playlist.length > 0 ? (
-            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+            <ScrollArea className="h-[650px] w-full rounded-md border p-4">
               <ul className="space-y-4">
                 {playlist.map((track, index) => (
                   <li
@@ -109,6 +122,24 @@ const PlaylistPage: React.FC = () => {
           )}
         </div>
         <div>
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {artistsImage.map((artist) => {
+              return (
+                <div
+                  className="w-[150px] h-[150px] flex items-center justify-center bg-gray-100"
+                  key={artist.id}
+                >
+                  <Image
+                    src={artist.imageUrl}
+                    alt="Artist Image"
+                    width={150}
+                    height={150}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              );
+            })}
+          </div>
           <Card>
             <CardHeader>
               <CardTitle>Create {festivalName} Playlist</CardTitle>

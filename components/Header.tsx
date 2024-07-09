@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   return (
     <header className="py-4 px-6">
       <div className="mx-auto flex justify-between items-center">

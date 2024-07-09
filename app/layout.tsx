@@ -26,11 +26,15 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={cn("min-h-screen font-sans antialiased", fontSans.variable)}
+        className={cn(
+          "min-h-screen font-sans antialiased background-container",
+          fontSans.variable
+        )}
       >
+        <div className="gradient-background"></div>
         <SessionProvider>
           <Header />
-          <main className="flex-grow">
+          <main className="flex-grow relative">
             <ThemeProvider
               attribute="class"
               defaultTheme="light"

@@ -42,7 +42,6 @@ export default function ArtistsPage() {
         try {
           const parsedArtists = JSON.parse(storedArtists) as string[];
           const fetchedArtists = await GetArtists(parsedArtists);
-          console.log("Fetched Artists: ", fetchedArtists);
           setArtists(fetchedArtists);
 
           // Check if any artists weren't found
@@ -55,7 +54,6 @@ export default function ArtistsPage() {
           );
           if (notFoundArtists.length > 0) {
             console.warn("Some artists were not found:", notFoundArtists);
-            // You could set these in state and display them to the user if you want
           }
         } catch (error) {
           console.error("Error fetching artists:", error);
@@ -81,7 +79,7 @@ export default function ArtistsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           {isLoading ? (
-            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+            <ScrollArea className="h-[700px] w-full rounded-md border p-4">
               <ul className="space-y-4">
                 {[...Array(10)].map((_, index) => (
                   <li key={index}>
@@ -93,7 +91,7 @@ export default function ArtistsPage() {
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : artists.length > 0 ? (
-            <ScrollArea className="h-dvh w-full rounded-md border p-4">
+            <ScrollArea className="h-[700px] w-full rounded-md border p-4">
               <ul className="space-y-4">
                 {artists.map((artist, index) => (
                   <li

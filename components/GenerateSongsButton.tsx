@@ -35,10 +35,10 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
     setError(null);
     try {
       const savedTracks = await CreatePlaylist(artists);
-      console.log("Saved tracks:", savedTracks);
 
       // Store the savedTracks in local storage
       localStorage.setItem("festifaves_playlist", JSON.stringify(savedTracks));
+      localStorage.setItem("festifaves_artists", JSON.stringify(artists))
 
       setButtonState("submitted");
 
@@ -52,6 +52,7 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
       setButtonState("idle");
     }
   };
+
 
   return (
     <div className="flex flex-col items-center">
