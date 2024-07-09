@@ -131,3 +131,10 @@
   );
   animation: shimmer 1.5s infinite;
 }
+
+
+@media (max-width: 768px) {
+  .background-container {
+    overflow: scroll;
+  }
+}
