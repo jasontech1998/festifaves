@@ -64,7 +64,6 @@ const UploadImage: React.FC = () => {
         throw new Error("Failed to upload file to S3");
       }
 
-      console.log("File uploaded successfully");
       setImageUrl(s3Url);
       localStorage.setItem("festifaves_image_url", s3Url);
     } catch (error) {
