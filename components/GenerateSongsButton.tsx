@@ -50,17 +50,11 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
       const { jobId } = await response.json();
 
       while (true) {
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         const statusResponse = await fetch(
           `/api/create-playlist?jobId=${jobId}`
         );
         const jobStatus = await statusResponse.json();
-
-        console.log(
-          "Job status received at:",
-          new Date().toISOString(),
-          jobStatus
-        );
         console.log("generate songs job status: ", jobStatus);
 
         if (jobStatus.status === "completed") {

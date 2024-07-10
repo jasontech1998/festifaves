@@ -197,59 +197,59 @@ export const CreatePlaylist = cache(
           }
         );
 
-        // If we haven't found any saved tracks in the top tracks, check the latest album
-        if (!savedTracks.some((track) => track.artistName === artist.name)) {
-          const albumsResponse = await fetch(
-            `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album&limit=1`,
-            {
-              headers: { Authorization: `Bearer ${session.token}` },
-            }
-          );
+        // // If we haven't found any saved tracks in the top tracks, check the latest album
+        // if (!savedTracks.some((track) => track.artistName === artist.name)) {
+        //   const albumsResponse = await fetch(
+        //     `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album&limit=1`,
+        //     {
+        //       headers: { Authorization: `Bearer ${session.token}` },
+        //     }
+        //   );
 
-          if (albumsResponse.ok) {
-            const albumsData = await albumsResponse.json();
-            if (albumsData.items.length > 0) {
-              const latestAlbum = albumsData.items[0];
-              const tracksResponse = await fetch(
-                `https://api.spotify.com/v1/albums/${latestAlbum.id}/tracks?limit=${limit}`,
-                {
-                  headers: { Authorization: `Bearer ${session.token}` },
-                }
-              );
+        //   if (albumsResponse.ok) {
+        //     const albumsData = await albumsResponse.json();
+        //     if (albumsData.items.length > 0) {
+        //       const latestAlbum = albumsData.items[0];
+        //       const tracksResponse = await fetch(
+        //         `https://api.spotify.com/v1/albums/${latestAlbum.id}/tracks?limit=${limit}`,
+        //         {
+        //           headers: { Authorization: `Bearer ${session.token}` },
+        //         }
+        //       );
 
-              if (tracksResponse.ok) {
-                const tracksData = await tracksResponse.json();
-                const trackIds = tracksData.items.map(
-                  (track: { id: string }) => track.id
-                );
-                const albumSavedResponse = await fetch(
-                  `https://api.spotify.com/v1/me/tracks/contains?ids=${trackIds.join(
-                    ","
-                  )}`,
-                  {
-                    headers: { Authorization: `Bearer ${session.token}` },
-                  }
-                );
+        //       if (tracksResponse.ok) {
+        //         const tracksData = await tracksResponse.json();
+        //         const trackIds = tracksData.items.map(
+        //           (track: { id: string }) => track.id
+        //         );
+        //         const albumSavedResponse = await fetch(
+        //           `https://api.spotify.com/v1/me/tracks/contains?ids=${trackIds.join(
+        //             ","
+        //           )}`,
+        //           {
+        //             headers: { Authorization: `Bearer ${session.token}` },
+        //           }
+        //         );
 
-                if (albumSavedResponse.ok) {
-                  const albumSavedData = await albumSavedResponse.json();
-                  tracksData.items.forEach(
-                    (track: { id: string; name: string }, index: number) => {
-                      if (albumSavedData[index]) {
-                        savedTracks.push({
-                          name: track.name,
-                          id: track.id,
-                          artistName: artist.name,
-                          albumName: latestAlbum.name,
-                        });
-                      }
-                    }
-                  );
-                }
-              }
-            }
-          }
-        }
+        //         if (albumSavedResponse.ok) {
+        //           const albumSavedData = await albumSavedResponse.json();
+        //           tracksData.items.forEach(
+        //             (track: { id: string; name: string }, index: number) => {
+        //               if (albumSavedData[index]) {
+        //                 savedTracks.push({
+        //                   name: track.name,
+        //                   id: track.id,
+        //                   artistName: artist.name,
+        //                   albumName: latestAlbum.name,
+        //                 });
+        //               }
+        //             }
+        //           );
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
 
         // If both of these didn't work, then just add the top 2 songs from the artist
         if (!savedTracks.some((track) => track.artistName === artist.name)) {
