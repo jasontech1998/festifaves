@@ -24,7 +24,9 @@ const transition = { duration: 0.2 };
 const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
   artists,
 }) => {
-  const [buttonState, setButtonState] = useState<"idle" | "loading" | "submitted">("idle");
+  const [buttonState, setButtonState] = useState<
+    "idle" | "loading" | "submitted"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const router = useRouter();
@@ -33,36 +35,46 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
     setButtonState("loading");
     setError(null);
     try {
-      const response = await fetch('/api/create-playlist', {
-        method: 'POST',
+      const response = await fetch("/api/create-playlist", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ artists }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to initiate playlist creation');
+        throw new Error("Failed to initiate playlist creation");
       }
 
       const { jobId } = await response.json();
 
       while (true) {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Poll every 2 seconds
-        const statusResponse = await fetch(`/api/create-playlist?jobId=${jobId}`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every second
+        const statusResponse = await fetch(
+          `/api/create-playlist?jobId=${jobId}`
+        );
         const jobStatus = await statusResponse.json();
 
-        console.log('generate songs job status: ', jobStatus);
+        console.log(
+          "Job status received at:",
+          new Date().toISOString(),
+          jobStatus
+        );
+        console.log("generate songs job status: ", jobStatus);
 
-        if (jobStatus.status === 'completed') {
-          localStorage.setItem("festifaves_playlist", JSON.stringify(jobStatus.savedTracks));
+        if (jobStatus.status === "completed") {
+          localStorage.setItem(
+            "festifaves_playlist",
+            JSON.stringify(jobStatus.savedTracks)
+          );
           localStorage.setItem("festifaves_artists", JSON.stringify(artists));
           setButtonState("submitted");
           setTimeout(() => {
             router.push("/playlist");
           }, 1000);
           break;
-        } else if (jobStatus.status === 'failed') {
+        } else if (jobStatus.status === "failed") {
           throw new Error(jobStatus.error);
         }
         setProgress(jobStatus.progress);

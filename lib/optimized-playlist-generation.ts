@@ -85,7 +85,7 @@ async function processArtistsBatch(
 export async function getPlaylistStatus(jobId: string) {
   try {
     const jobData = await kv.get(jobId);
-    console.log("jobData from kv: ", jobData);
+
     if (!jobData) {
       console.warn(`No data found for jobId: ${jobId}`);
       return null;
