@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArtistResult, CreatePlaylist } from "@/lib/actions";
+import { ArtistResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,33 +24,55 @@ const transition = { duration: 0.2 };
 const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
   artists,
 }) => {
-  const [buttonState, setButtonState] = useState<
-    "idle" | "loading" | "submitted"
-  >("idle");
+  const [buttonState, setButtonState] = useState<"idle" | "loading" | "submitted">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const router = useRouter();
 
   const handleGeneratePlaylist = async () => {
     setButtonState("loading");
     setError(null);
     try {
-      const savedTracks = await CreatePlaylist(artists);
+      const response = await fetch('/api/create-playlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ artists }),
+      });
 
-      localStorage.setItem("festifaves_playlist", JSON.stringify(savedTracks));
-      localStorage.setItem("festifaves_artists", JSON.stringify(artists))
+      if (!response.ok) {
+        throw new Error('Failed to initiate playlist creation');
+      }
 
-      setButtonState("submitted");
+      const { jobId } = await response.json();
 
-      setTimeout(() => {
-        router.push("/playlist");
-      }, 1000);
+      while (true) {
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Poll every 2 seconds
+        const statusResponse = await fetch(`/api/create-playlist?jobId=${jobId}`);
+        const jobStatus = await statusResponse.json();
+
+        console.log('generate songs job status: ', jobStatus);
+
+        if (jobStatus.status === 'completed') {
+          localStorage.setItem("festifaves_playlist", JSON.stringify(jobStatus.savedTracks));
+          localStorage.setItem("festifaves_artists", JSON.stringify(artists));
+          setButtonState("submitted");
+          setTimeout(() => {
+            router.push("/playlist");
+          }, 1000);
+          break;
+        } else if (jobStatus.status === 'failed') {
+          throw new Error(jobStatus.error);
+        }
+        setProgress(jobStatus.progress);
+      }
     } catch (error) {
       console.error("Error creating playlist:", error);
       setError("Failed to create playlist. Please try again.");
       setButtonState("idle");
     }
   };
-
 
   return (
     <div className="flex flex-col items-center">
@@ -106,7 +128,7 @@ const GenerateSongsButton: React.FC<GenerateSongsButtonProps> = ({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
-               Generating...
+              Generating... {progress}%
             </motion.div>
           )}
           {buttonState === "submitted" && (

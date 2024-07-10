@@ -135,7 +135,7 @@ export async function CreatePlaylistLink(
 }
 
 export const CreatePlaylist = cache(
-  async (artists: ArtistResult[]): Promise<SavedTrack[]> => {
+  async (artists: ArtistResult[], token: string): Promise<SavedTrack[]> => {
     noStore();
     const session = await auth();
 

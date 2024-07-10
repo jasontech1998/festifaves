@@ -56,7 +56,7 @@ export const festivals = [
       "The Japanese House",
       "Romy",
       "The Last Dinner Party",
-      "Babaandtoogood",
+      "Badbadnotgood",
       "STRFKR",
       "Real Estate",
       "K.Flay",
